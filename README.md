@@ -78,7 +78,7 @@ STM32的UART具有检测RX线在一段时间内未活动的能力。这是通过
 
 一个例子：以`115200`波特率传输`1  byte`，大约需要`~100us`；对于`3 bytes`，总共约为`~300us`。当接收到第三个字节后，线路进入空闲状态，空闲状态达到 `1` 帧时间（在本例中为 `100us`）时，空闲线路（Idle Line）事件会触发中断。
 
-![IDLE LINE DEMO](imgs\idle_line_demo.png)
+![IDLE LINE DEMO](https://github.com/JinliangYan/JinliangYan-stm32-usart-uart-dma-rx-tx/blob/master/imgs/idle_line_demo.png)
 
 - 应用程序接收到`3 bytes`，在 `115200 `波特率下大约需要 `300us`
 
@@ -148,7 +148,7 @@ hello_world_arr[] = "HelloWorld";
 
 这里将描述 4 种可能的情况和一种附加情况，解释为什么应用程序需要 *HC/TC* 事件
 
-![](D:\StudyNote\Stm32\rx-tx-dma\imgs\dma_events.svg)
+![](https://github.com/JinliangYan/JinliangYan-stm32-usart-uart-dma-rx-tx/blob/master/imgs/dma_events.svg)
 
 这张图片用到的缩写：
 
