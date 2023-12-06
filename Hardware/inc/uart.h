@@ -18,8 +18,8 @@
 #include "stm32f10x.h"
 #include "stddef.h"
 void uart_init(void);
-void uart_rx_check(void);
-void uart_process_data(const void* data, size_t len);
+void uart_send_byte(uint8_t byte);
+void uart_send_bytes(const uint8_t bytes[], size_t len);
 void uart_send_string(const char* str);
 
 #endif //STM32F103C8T6_UART_RX_TX_DMA_UART_H
