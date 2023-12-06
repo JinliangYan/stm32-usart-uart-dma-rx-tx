@@ -215,6 +215,9 @@ void uart_init(void) {
     usart_init_structure.USART_BaudRate = UART_BOUND_RATE;
     USART_Init(USART1, &usart_init_structure);
 
+    /* Enable IDLE interrupt */
+    USART_ITConfig(USART1, USART_IT_IDLE, ENABLE);
+
     /* USART interrupt */
     NVIC_SetPriority(USART1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
     NVIC_EnableIRQ(USART1_IRQn);
