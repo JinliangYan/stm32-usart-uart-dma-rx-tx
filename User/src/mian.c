@@ -4,7 +4,7 @@
 int main(void) {
     nvic_init();
     uart_init();
-    uart_send_string("Hello World");
+    uart_send_string("Hello World\r\n");
 
     while (true) {
 

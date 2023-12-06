@@ -22,19 +22,19 @@ void uart_send_string(const char* str);
 
 
 /**
- * \brief           Calculate length of statically allocated array
+ * @brief           Calculate length of statically allocated array
  */
 #define ARRAY_LEN(x)            (sizeof(x) / sizeof((x)[0]))
 
 /**
- * \brief           USART RX buffer for DMA to transfer every received byte
- * \note            Contains raw data that are about to be processed by different events
+ * @brief           USART RX buffer for DMA to transfer every received byte
+ * @note            Contains raw data that are about to be processed by different events
  */
-uint8_t usart_rx_dma_buffer[DMA_BUF_SIZE];
+uint8_t uart_rx_dma_buffer[DMA_BUF_SIZE];
 
 
 /**
- * \brief           Check for new data received with DMA
+ * @brief           Check for new data received with DMA
  *
  * User must select context to call this function from:
  * - Only interrupts (DMA HT, DMA TC, UART IDLE) with same preemption priority level
@@ -66,7 +66,7 @@ void uart_rx_check(void) {
     size_t pos;
 
     /* 计算缓冲区中的当前位置并检查是否有新数据可用 */
-    pos = ARRAY_LEN(usart_rx_dma_buffer) - DMA_GetCurrDataCounter(DMA1_Channel5);
+    pos = ARRAY_LEN(uart_rx_dma_buffer) - DMA_GetCurrDataCounter(DMA1_Channel5);
     if (pos != old_pos) {                       /* 检查接收到的数据是否发生变化 */
         if (pos > old_pos) {                    /* 当前位置位于先前位置之上 */
             /*
@@ -86,7 +86,7 @@ void uart_rx_check(void) {
              * [ N - 1 ]
              */
 
-            uart_process_data(&usart_rx_dma_buffer[old_pos], pos - old_pos);
+            uart_process_data(&uart_rx_dma_buffer[old_pos], pos - old_pos);
         } else {
             /*
              * 处理以"溢出"模式进行。
@@ -105,9 +105,9 @@ void uart_rx_check(void) {
              * [ N - 1 ]            |---------------------------------|
              */
 
-            uart_process_data(&usart_rx_dma_buffer[old_pos], ARRAY_LEN(usart_rx_dma_buffer) - old_pos);
+            uart_process_data(&uart_rx_dma_buffer[old_pos], ARRAY_LEN(uart_rx_dma_buffer) - old_pos);
             if (pos > 0) {
-                uart_process_data(&usart_rx_dma_buffer[0], pos);
+                uart_process_data(&uart_rx_dma_buffer[0], pos);
             }
         }
         old_pos = pos;                          /* 将当前位置保存为下一次传输的旧位置 */
@@ -115,10 +115,30 @@ void uart_rx_check(void) {
 }
 
 /**
- * \brief           Process received data over UART
- * \note            Either process them directly or copy to other bigger buffer
- * \param[in]       data: Data to process
- * \param[in]       len: Length in units of bytes
+ * @brief       UART send a single byte
+ * @param       byte: byte to send
+ */
+void uart_send_byte(uint8_t byte) {
+    USART_SendData(USART1, byte);
+    while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET) {}
+}
+
+/**
+ * @brief               UART send bytes
+ * @param               bytes:Bytes array to send
+ * @param               len:Length of bytes array
+ */
+void uart_send_bytes(const uint8_t bytes[], size_t len) {
+    for (int i = 0; i < len; ++i) {
+        uart_send_byte(bytes[i]);
+    }
+}
+
+/**
+ * @brief           Process received data over UART
+ * @note            Either process them directly or copy to other bigger buffer
+ * @param[in]       data: Data to process
+ * @param[in]       len: Length in units of bytes
  */
 void uart_process_data(const void* data, size_t len) {
     const uint8_t* d = data;
@@ -138,11 +158,11 @@ void uart_process_data(const void* data, size_t len) {
 }
 
 /**
- * \brief           Send string to USART
- * \param[in]       str: String to send
+ * @brief           Send string to USART
+ * @param[in]       str: String to send
  */
 void uart_send_string(const char* str) {
-    uart_process_data(str, strlen(str));
+    uart_send_bytes((uint8_t*)str, strlen(str));
 }
 
 /**
@@ -156,7 +176,7 @@ static void uart_dma_init(void) {
     dma_init_structure.DMA_BufferSize = DMA_BUF_SIZE;                           //设置DMA的缓冲区大小
     dma_init_structure.DMA_DIR = DMA_DIR_PeripheralSRC;                         //设置DMA为外设到内存方向
     dma_init_structure.DMA_M2M = DMA_M2M_Disable;                               //禁止内存到内存的运输
-    dma_init_structure.DMA_MemoryBaseAddr = (uint32_t)usart_rx_dma_buffer;      //设置内存的地址
+    dma_init_structure.DMA_MemoryBaseAddr = (uint32_t)uart_rx_dma_buffer;      //设置内存的地址
     dma_init_structure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;            //每次传输单位为字节
     dma_init_structure.DMA_MemoryInc = DMA_MemoryInc_Enable;                    //传输过程中内存地址自增
     dma_init_structure.DMA_Mode = DMA_Mode_Circular;                            //设置为循环模式
@@ -180,7 +200,7 @@ static void uart_dma_init(void) {
 }
 
 /**
- * \brief           USART1 Initialization Function
+ * @brief           USART1 Initialization Function
  */
 void uart_init(void) {
     /* Peripheral clock enable */
@@ -231,7 +251,7 @@ void uart_init(void) {
 /* Interrupt handlers here */
 
 /**
- * \brief DMA1 channel5 interrupt handler for USART1 RX
+ * @brief DMA1 channel5 interrupt handler for USART1 RX
  */
 void DMA1_Channel5_IRQHandler(void) {
     /* Check half-transfer complete interrupt */
@@ -250,7 +270,7 @@ void DMA1_Channel5_IRQHandler(void) {
 }
 
 /**
- * \brief           USART1 global interrupt handler
+ * @brief           USART1 global interrupt handler
  */
 void USART1_IRQHandler(void) {
     /* Check for IDLE line interrupt */

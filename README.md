@@ -224,7 +224,7 @@ void uart_rx_check(void) {
     size_t pos;
 
     /* 计算缓冲区中的当前位置并检查是否有新数据可用 */
-    pos = ARRAY_LEN(usart_rx_dma_buffer) - DMA_GetCurrDataCounter(DMA1_Channel5);
+    pos = ARRAY_LEN(uart_rx_dma_buffer) - DMA_GetCurrDataCounter(DMA1_Channel5);
     if (pos != old_pos) {                       /* 检查接收到的数据是否发生变化 */
         if (pos > old_pos) {                    /* 当前位置位于先前位置之上 */
             /*
@@ -245,7 +245,7 @@ void uart_rx_check(void) {
              */
             
             /* 这里只是将数据回送串口, 可以调用其他处理函数 */
-            uart_process_data(&usart_rx_dma_buffer[old_pos], pos - old_pos);
+            uart_process_data(&uart_rx_dma_buffer[old_pos], pos - old_pos);
         } else {
             /*
              * 处理以"溢出"模式进行。
@@ -265,10 +265,10 @@ void uart_rx_check(void) {
              */
             
             /* 这里只是将数据回送串口, 可以调用其他处理函数 */
-            uart_process_data(&usart_rx_dma_buffer[old_pos], ARRAY_LEN(usart_rx_dma_buffer) - old_pos);
+            uart_process_data(&uart_rx_dma_buffer[old_pos], ARRAY_LEN(uart_rx_dma_buffer) - old_pos);
             if (pos > 0) {
                 /* 这里只是将数据回送串口, 可以调用其他处理函数 */
-                uart_process_data(&usart_rx_dma_buffer[0], pos);
+                uart_process_data(&uart_rx_dma_buffer[0], pos);
             }
         }
         old_pos = pos;                          /* 将当前位置保存为下一次传输的旧位置 */
