@@ -86,7 +86,6 @@ void uart_rx_check(void) {
              * [ N - 1 ]
              */
 
-            /* 这里只是将数据回送串口, 可以调用其他处理函数 */
             uart_process_data(&usart_rx_dma_buffer[old_pos], pos - old_pos);
         } else {
             /*
@@ -106,10 +105,8 @@ void uart_rx_check(void) {
              * [ N - 1 ]            |---------------------------------|
              */
 
-            /* 这里只是将数据回送串口, 可以调用其他处理函数 */
             uart_process_data(&usart_rx_dma_buffer[old_pos], ARRAY_LEN(usart_rx_dma_buffer) - old_pos);
             if (pos > 0) {
-                /* 这里只是将数据回送串口, 可以调用其他处理函数 */
                 uart_process_data(&usart_rx_dma_buffer[0], pos);
             }
         }
