@@ -274,8 +274,21 @@ void DMA1_Channel5_IRQHandler(void) {
  */
 void USART1_IRQHandler(void) {
     /* Check for IDLE line interrupt */
-    if (USART_GetITStatus(USART1, USART_IT_IDLE)) {
-        USART_ClearITPendingBit(USART1, USART_IT_IDLE);        /* Clear IDLE line flag */
+    if (USART_GetITStatus(USART1, USART_IT_IDLE) == SET) {
+//        log_d("USART_IT_IDLE Interrupt");
+        /**
+        * @note
+        *   - PE (Parity error), FE (Framing error), NE (Noise error), ORE (OverRun
+        *     error) and IDLE (Idle line detected) pending bits are cleared by
+        *     software sequence: a read operation to USART_SR register
+        *     (USART_GetITStatus()) followed by a read operation to USART_DR register
+        *     (USART_ReceiveData()).
+        */
+        /* So let's comment it */
+//        USART_ClearITPendingBit(USART1, USART_IT_IDLE);
+        /* Then read the DR register */
+        USART1->DR;
+        /* Here the USART_IT_IDLE pending bit cleared */
         uart_rx_check();                                                       /* Check for data to process */
     }
 
